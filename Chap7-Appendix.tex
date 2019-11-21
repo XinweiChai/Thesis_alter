@@ -1,0 +1,623 @@
+\chapter{Representation of Different Models}
+\section{Transformation from BNs to ABANs}\label{appendix:trans}
+
+Given Boolean functions $v_i(t+1)=f_i(\mathbf{V}_i)$, with $\mathbf{V}_i$ the set of participating variables among $v_1(t),\cdots,v_n(t)$.
+Boolean functions could be transformed to equivalent CNF (conjunctive normal form) and DNF (disjunctive normal form) if the length of Boolean functions is limited to $O(1)$~\cite{miltersen2005converting} which is often the case.
+
+\begin{proposition}[Transformation from BN to ABAN]
+Given a BN $G_B=(V,F)$, with its functions in CNF form $v^i(t+1)=A_1\land\ldots A_j \ldots\land A_n$ and DNF form $v^i(t+1)=A'_1\lor\ldots A_k\ldots\lor A'_m$, an equivalent ABAN $\mathbb{A}$ has transitions $A_j\to v^i_1$ and $\lnot A_k\to v^i_0$ where $A_j$ are disjunctions and $A'_K$ are conjunctions.
+\end{proposition}
+
+\begin{example}
+Let $G_B=(V,F)$ a BN with $V=\{a,b,c,d,e\}$, and has only one Boolean function, $F=\{f(a)= (b\lor c)\land(d\lor e)\}$, we have 
+$f(a)=(b\land d)\lor(b\land e)\lor(c\land d)\lor(c\land e)$, and $\lnot f(a)=(\lnot b\land \lnot c)\lor(\lnot d\land \lnot e)$. 
+The equivalent ABAN is then constructed: 5 automata $\mathbf{\Sigma}=\{a,b,c,d,e\}$, with transitions: $\mathbf{T}=\{\acm{b_1,d_1}{a_0}{a_1},\ \acm{b_1,e_1}{a_0}{a_1},\ \acm{c_1,d_1}{a_0}{a_1},\ \acm{c_1,e_1}{a_0}{a_1},\ \acm{b_0,c_0}{a_1}{a_0},\ \acm{d_0,e_0}{a_1}{a_0}\}$.
+\end{example}
+
+%\section{Multivalued Logic Program}
+%PermReach and ASPReach can also be applied to multivalued Logic Programs.
+
+%\textbf{To be continued}
+
+\chapter{Algorithms}\label{chap:algo}
+
+\begin{algorithm}[ht]
+\begin{algorithmic}
+    \State \textbf{Input}: a set of annotated atoms $\mathcal{B}$ and a set of state transitions $E$
+    \State \textbf{Output}: an NLP $P$
+    \State Initialization: $P:= \{var^{val}\gets\varnothing\mid var^{val}\in \mathcal{B}\}$
+    \While{$E\neq \varnothing$}
+        \State Pick $(I,J)\in E,E:= E \miset{(I,J)}$
+        \For{$A\in J$}
+            \State{\textcolor{gray}{// Create all the local state transitions}}
+            \State $R_A^I:= (A\gets\underset{B_i\in I}{\bigwedge}B_i\land \underset{C_j\in (\mathcal{B}\setminus I)}{\bigwedge}\lnot C_j)$
+            \State{\textcolor{gray}{// Delete the rules in conflict}}
+            \State $P:= \mathbf{Specialize}(P,R_A^I)$
+        \EndFor
+    \EndWhile
+    \State\Return $P$
+\end{algorithmic}
+\caption{Synchronous LFIT}\label{alg:syncLFIT}
+\end{algorithm}
+
+\begin{algorithm}[ht]
+\begin{algorithmic}
+    \State Input: an NLP $P$ and a rule $R$
+    \State Output: the maximal specialization of $P$ that does not subsume $R$
+    \State Initialization: $conflicts := \varnothing$
+    \State{\textcolor{gray}{// Search rules that need to be specialized}}
+    \For{$R_P\in P$}
+        \If{$b(R_P)\subseteq b(R)$}
+            \State $conflicts := conflicts\addset{R_P}$
+            \State $P := P \miset{R_P} $
+        \EndIf
+    \EndFor
+    \State{\textcolor{gray}{// Revise the rules by least specialization}}
+    \For{$R_c\in conflicts$}
+        \For{$l \in b(R)$}
+            \If{$l \not\in b(R_c)$ and $\lnot l \not\in b(R_c)$}
+                \State $R'_c:= (h(R_c) \gets (b(R_c) \addset{\lnot l}))$
+                \If{$P$ does not subsume $R_c$}
+                    \State $P := P \setminus$ all the rules subsumed by $R'_c$
+                    \State $P := P \addset{ R'_c}$
+                \EndIf
+            \EndIf
+        \EndFor
+    \EndFor
+    \State\Return $P$
+\end{algorithmic}
+\caption{\textbf{Specialize} in synchronous LFIT algorithm% in~\cite{ribeiro2015learning}
+}\label{alg:specializeLFIT}
+\end{algorithm}
+
+
+\begin{algorithm}[ht]
+\begin{algorithmic}
+    \State Input: an ABAN $\mathbb{A}=(\Sigma,T)$, an initial state $\alpha$, a target state $\omega$
+    \State Output: SLCG $l=(V_\st,V_\sol, E)$
+    \State Initialization: 
+    $Ls\gets \{\omega\}$, $V_\st\gets\varnothing$, $V_\sol\gets \varnothing$, $E\gets \varnothing$
+    \While{$Ls\neq \varnothing$}
+        \State $Ls=Ls\setminus V_\st$
+    	\For{$a_i\in Ls$}
+    		\State $Ls\gets Ls\miset{a_i}$
+    		\If{$a_i\in \alpha$}
+    			\State $E\gets E\addset{(a_i,\varnothing)} $
+        	\Else
+        	    \State{\textcolor{gray}{// Choose the transitions reaching $a_i$}}
+        		\For{$sol=A\to a_i\in \mathbf{T}$}
+        		    \State $V_\sol\gets V_\sol\addset{sol}$
+        		    \State $E\gets E\addset{(a_i,sol)} $
+        			\State $V_\st\gets V_\st\cup{A}$
+        			\For{$b_j\in A$}
+        				\State $E\gets E\addset{(sol,b_j)} $
+        			\EndFor
+        			\State $Ls\gets Ls\cup A$
+                    \State $V_\st\gets V_\st\cup Ls$
+        		\EndFor
+        		\State$V_\sol\gets V_\sol\addset{a_i.next}$           
+        	\EndIf
+    	\EndFor
+    \EndWhile
+    \State\Return{$(V_\st,V_\sol,E)$}
+\end{algorithmic}
+\caption{Construction of SLCG (over-approximation)}\label{AlgConstructLCG}
+\end{algorithm}
+
+\begin{algorithm}[ht]
+\begin{algorithmic}
+    \State Input: an ABAN $\mathbb{A}=(\Sigma,T)$, an initial state $\alpha$, a target state $\omega$
+    \State Output: SLCG $l=(V_\st,V_\sol, E)$
+    \State Initialization: 
+    $Ls\gets \{\omega\}$, $V_\st\gets\varnothing$, $V_\sol\gets \varnothing$, $E\gets \varnothing$, $rev\gets \varnothing$
+    \While{$Ls\neq \varnothing$}
+        \State $Ls=Ls\setminus V_\st$
+    	\For{$a_i\in Ls$}
+    		\State $Ls\gets Ls\miset{a_i}$
+    		\If{$a_i\in \alpha$}
+    			\State $E\gets E\addset{(a_i,\varnothing)}$
+    			\State{\textcolor{gray}{// Revise the reachability of initial state}}
+    			\State $rev\gets rev\addset{a_i}$
+        	\Else
+        	    \State{\textcolor{gray}{// Check if local initial state $a_{1-i}$ needs to be revised}}
+        	    \If{$a_{1-i}\in rev$}
+        	        \State $Ls\gets Ls\addset{a_{1-i}}$
+        	        \State $\alpha\gets\alpha\miset{a_{1-i}}$
+        	    \EndIf
+        	    \State{\textcolor{gray}{// Choose the transitions reaching $a_i$}}
+        		\For{$sol=A\to a_i\in \mathbf{T}$}
+        		    \State $V_\sol\gets V_\sol\addset{sol}$
+        		    \State $E\gets E\addset{(a_i,sol)} $
+        			\State $V_\st\gets V_\st\cup{A}$
+        			\For{$b_j\in A$}
+        				\State $E\gets E\addset{(sol,b_j)} $
+        			\EndFor
+        			\State $Ls\gets Ls\cup A$
+                    \State $V_\st\gets V_\st\cup Ls$
+        		\EndFor
+        		\State$V_\sol\gets V_\sol\addset{a_i.next}$           
+        	\EndIf
+    	\EndFor
+    \EndWhile
+    \State\Return{$(V_\st,V_\sol,E)$}
+\end{algorithmic}
+\caption{Construction of SLCG (under-approximation)}\label{AlgConstructLCGUnder}
+\end{algorithm}
+
+\begin{algorithm}[ht]
+\begin{algorithmic}
+    \State Input: an SLCG $l=(V_\st, {V_\mathrm{sol}},E)$, an initial state $\alpha$, a target state $\omega$
+    \State Output: a Boolean $reach'$
+    \Procedure{pseudoReach}{$s$}
+    \State \textcolor{gray}{// If $\omega$ is in initial state, it is already reached}
+    \If {$\omega\in \alpha$}
+       \State\Return \textbf{True}
+    \EndIf
+    \State \textcolor{gray}{// The reachability of $s$ depends on its successor solution nodes}
+    \If {$\not\exists (s,sol) \in E$}
+        \State\Return \textbf{False}
+    \EndIf
+    \For{each $(s,sol) \in E$}
+        \If{\Call{fireable}{$sol$}}
+            \State\Return \textbf{True}
+        \EndIf
+    \EndFor
+    \State\Return \textbf{False}
+    \EndProcedure
+    \Procedure{fireable}{$sol$}
+    \For{each $(sol,s') \in E$}
+        \If{\Call{pseudoReach}{$s'$}}
+            \State\Return \textbf{False}
+        \EndIf
+    \EndFor
+    \State\Return \textbf{True}
+    \EndProcedure
+\end{algorithmic}
+\caption{Pseudo-reachability $reach'$}\label{algPseudo}
+\end{algorithm}
+
+\begin{algorithm}\caption{PermReach}\label{alg:perm}
+\begin{algorithmic}
+    \State Input: an SLCG $l=(V_\st,V_\sol, E)$, an initial state $\alpha$, a target state $\omega$, an integer $k$
+    \State Output: reachability $r(\alpha,\omega)$
+    \State \textcolor{gray}{// 1) Try to break cycles}%\label{delete_cycle_begin}
+    \For{each $ scc=(V'_\st,V'_\sol) \in \mathrm{SCC}(l)$ with $V'_\st \subseteq V_\st,V'_\sol\subseteq V_\sol$}
+        \If{$scc$ has less than one incoming edge}
+            \For{each $v \in V'_\st$}
+                \If {$\exists(v,v')\in E, v' \in (V_\sol \setminus V'_\sol)$}
+                    \State $E\gets E\miset{(v,v'')|v''\in V'_\sol,(v,v'')\in E}$
+                \EndIf
+            \EndFor
+        \EndIf
+    \EndFor %\label{delete_cycle_end}
+    \State{\textcolor{gray}{// 2) Remove useless nodes/edges}} %\label{prune_begin}
+    \State pruned = true
+    \While{pruned}
+        \State pruned = false
+        \For {$v \in V_\st$}
+            \If{$\not\exists(v,v')\in E$}
+                \State $V_\st \gets V_\st\miset{v}$; $E\gets E\miset{(v'',v)\in E}$
+                \State $E\gets E\miset{ (v'',sol)\in E | sol \in \{sol = (A \rightarrow a) \in V_\sol | v \in A}\}$
+                \State $V_\sol \gets V_\sol\miset{sol = (A \rightarrow a) \in V_\sol | v \in A}$
+                \State pruned = true
+            \EndIf
+        \EndFor %\label{prune_end}
+    \EndWhile
+    \State \textcolor{gray}{// 3) Check pseudo-reachability} %\label{pseudo_reach_begin}
+    \If {PSEUDOREACH$(l)=\false$}
+        \State \Return $\false$
+    \EndIf %\label{pseudo_reach_end}
+
+    \algstore{myalg}
+\end{algorithmic}
+\end{algorithm}
+
+\clearpage
+
+\begin{algorithm}
+%  \ContinuedFloat
+\caption{PermReach (continued)}
+\begin{algorithmic}
+    \algrestore{myalg}
+    \State \textcolor{gray}{// 4) main search loop} %\label{main_loop_begin}
+    \For{each $i$ in $1\ldots k$}
+        \State $l'=(V'_\st, V'_\sol,E')\gets(V_\st, V_\sol,E)$
+        \For{$v \in V'_{state}$} \textcolor{gray}{// Treat each OR gates}
+            \State pick a random element $(v,v') \in E'$
+            \State $E'\gets E' \miset{(v,v'') \in E'| v''\neq v'}$
+        \EndFor
+        \If{$l'$ contains cycles}
+            \State \textbf{continue}
+        \EndIf
+        %\State $(r,t)\gets\mathrm{ASPsolve}(l')$
+        \State Obtain simple \textbf{AND gates} $simp$ from $l'$
+        \While{$simp\neq \varnothing$}
+            \State $re\gets\false$ 
+            \State\textcolor{gray}{// check the reachability of $simp$, if true, update initial state}
+            \For{$i \in perm(simp)$} 
+                \If{$REACH(i)=\true$}
+                    \State $re\gets\true$
+                    \State \textbf{break}
+                \EndIf
+            \EndFor
+            \If{$re=\textbf{True}$}
+                \State update $\alpha$ by firing transitions in $simp$
+                \State $V'_\sol\gets V'_\sol \setminus simp$
+            \Else
+                \State \textbf{break}
+            \EndIf
+            \State Obtain simple \textbf{AND gates} $simp$ from $l'$
+        \EndWhile
+        \If{$re=\textbf{True}$}
+            \State\Return{$\true$}
+        \EndIf
+    \EndFor %\label{main_loop_end}
+    \State \Return{$\mathbf{Inconclusive}$}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[ht]
+\begin{algorithmic}
+    \State Input: SLCG $l=(V_\st,V_\sol, E)$, an integer $k$
+    \State Output: reachability $r$ and a trajectory $t$
+    \State Compute SCCs, classify them into $\mathrm{SCC1}(l)$ with at most 1 incoming edge and $\mathrm{SCC2}(l)$ otherwise
+    \State \textcolor{gray}{// 1) Break all cycles and prune useless branches}\label{delete_cycle_begin}
+    \For{each $(V'_\st \subseteq V_\st,V'_\sol \subseteq V_\sol) \in \mathrm{SCC1}(l)$}
+        \For{each $v \in V'_\st$}
+        \If {$\exists(v,v')\in E, v' \in (V_\sol \setminus V'_\sol)$}
+            \State $E\gets E\miset{(v,v'')|v''\in V'_\sol,(v,v'')\in E}$
+        \EndIf
+    \EndFor
+    \EndFor \label{delete_cycle_end}
+    \State{\textcolor{gray}{// 2) remove useless nodes/edges}} \label{prune_begin}
+    \State pruned = \textbf{True}
+    \While{pruned}
+        \State pruned = \textbf{False}
+        \For {$v \in V_\st$}
+            \If{$\not\exists(v,v')\in E$}
+                \State $V_\st \gets V_\st\miset{v}$; $E\gets E\miset{(v'',v)\in E}$
+                \State $E\gets E\miset{(v'',sol)\in E | sol \in \{sol = (A \rightarrow a) \in V_\sol | v \in A\}}$
+                \State $V_\sol \gets V_\sol\backslash \{sol = (A \rightarrow a) \in V_\sol | v \in A\}$
+                \State pruned = \textbf{True}
+            \EndIf
+        \EndFor \label{prune_end}
+    \EndWhile
+    \State \textcolor{gray}{// 3) Check pseudo-reachability} \label{pseudo_reach_begin}
+    \If {$pseudoReach(l)=\textbf{False}$}
+        \State \Return $(\false,\varnothing)$
+    \EndIf \label{pseudo_reach_end}
+    
+    \State \textcolor{gray}{// 4) main search loop} \label{main_loop_begin}
+    \For{each $i$ in $1\ldots k$}
+        \State $l'=(V'_\st, V'_\sol,E')\gets(V_\st, V_\sol,E)$ 
+        \For{$v \in V'_{state}$} \textcolor{gray}{// Treat each OR gates}
+            \State pick a random element $(v,v') \in E'$
+            \State $E'\gets E' \miset{(v,v'') \in E'| v''\neq v'}$ with $\nexists i\in \mathrm{SCC2}(l)$ and $i\in E'$
+        \EndFor
+        \State $(r,t)\gets\mathrm{ASPsolve}(l')$
+        \If{$r=\textbf{True}$}
+            \State\Return{$(\true,t)$}
+        \EndIf
+    \EndFor \label{main_loop_end}
+    \State \Return{$(\mathbf{Inconclusive},\varnothing)$}
+\end{algorithmic}
+\caption{ASPReach}\label{algOverall}
+\end{algorithm}
+
+\begin{algorithm}[ht]
+\caption{Completion by over-approximation}\label{algComOver}
+\begin{algorithmic}
+    \State Input: an incomplete ABAN $\mathbb{A}=(\Sigma,T)$, a set of candidate regulations $R$, targeted reachability $(\alpha,\omega)$
+    \State Output: Completed set $CS$ 
+    \State Initialization: $rev\gets\{(\{\omega\},\{\omega\},\varnothing)\}$, $CS\gets \varnothing$
+    \State Construct SLCG $l=SLCG(\alpha,\omega)=(V_\st,V_\sol, E)$ by Algorithm~\ref{AlgConstructLCG}
+    \If {$reach(\alpha,\omega)$}
+        \State\Return{$(\true,\varnothing)$}
+    \EndIf
+    \While {$rev\neq \varnothing$}
+    \State{\textcolor{gray}{// $ls$: traversed local states, $fr$: local states to be revised in the next step, $tr$: transitions to be added}}
+        \For {$i=(ls,fr,tr)\in rev$}
+            \State $rev\gets rev \miset{i}$
+            \If{$fr=\varnothing$}
+                \State $CS\gets CS\addset{ls}$
+                \State \textbf{continue}
+            \EndIf
+            \For{$j\in fr$}
+                \For{$k\in j.next$}
+                    \If{$head(k)\not\subseteq ls$}
+                        \State $rev\gets rev\addset{(ls\cup head(k), fr\cup head(k)\miset{j},tr)}$
+                    \EndIf
+                \EndFor
+            \EndFor
+            \State $cand\gets\varnothing$
+            \For {$j=(b,h,sgn)\in R$}
+                \If {$\exists h_x\in fr\land\acm{b_{x \oplus sgn}}{h_{1-x}}{h_x}\notin T$}
+                    \State $cand \gets cand\addset{\acm{b_{x \oplus sgn}}{h_{1-x}}{h_x}}$
+                    \State 
+                        $\begin{aligned}
+                            rev\gets rev&\addset{(ls\addset{b_{x \oplus sgn}}, fr\addset{b_{x \oplus sgn}}\miset{h_x},\\
+                            &tr\addset{\acm{b_{x \oplus sgn}}{h_{1-x}}{h_x}})}
+                        \end{aligned}$
+                \EndIf
+            \EndFor
+        \EndFor
+    \EndWhile
+    \If{$CS=\varnothing$}
+        \State\Return{$(\false,\varnothing)$}
+    \EndIf
+    \State\Return{$(\true,CS)$}
+\end{algorithmic}
+\end{algorithm}
+%Remark: every element in $rev$ is defined as $(ls, fr, tr)$, where
+
+\begin{algorithm}[ht]
+\caption{Completion by under-approximation}\label{algComUnder}
+\begin{algorithmic}
+\State Input: an incomplete ABAN $\mathbb{A}=(\Sigma,T)$, a set of candidate regulations $R$, a targeted reachability $(\alpha,\omega)$
+\State Output: Completed set $CS$ %or $\varnothing$ if there is no solution
+\State Initialization: $rev\gets\{(\{\omega\},\{\omega\},\varnothing)\}$, $CS\gets \varnothing$, $CS_{iter}\gets \varnothing$
+\Do
+\State SLCG $l=SLCG(\alpha,\omega)=(V_\st,V_\sol, E)$ by Algorithm~\ref{AlgConstructLCGUnder}
+\While {$rev\neq \varnothing$}
+    \For {$i=(ls,fr,tr)\in rev$}
+        \State $rev\gets rev \miset{i}$
+        \If{$fr=\varnothing$}
+            \State $CS_{iter}\gets CS_{iter}\addset{ls}$
+            \State \textbf{continue}
+        \EndIf
+        \For{$j\in fr$}
+            \For{$k\in j.next$}
+                \If{$head(k)\not\subseteq ls$}
+                    \State $rev\gets rev\addset{(ls\cup head(k), fr\cup head(k)\miset{j},tr)}$
+                \EndIf
+            \EndFor
+        \EndFor
+        \State $cand\gets\varnothing$
+        \For {$j=(b,h,sgn)\in R$}
+            \If {$\exists h_x\in fr\land\acm{b_{x \oplus sgn}}{h_{1-x}}{h_x}\notin T$}
+                \State $cand \gets cand\addset{\acm{b_{x \oplus sgn}}{h_{1-x}}{h_x}}$
+                \State 
+                    $\begin{aligned}
+                        rev\gets rev&\addset{(ls\addset{b_{x \oplus sgn}}, fr\addset{b_{x \oplus sgn}}\miset{h_x},\\
+                        &tr\addset{\acm{b_{x \oplus sgn}}{h_{1-x}}{h_x}})}
+                    \end{aligned}$
+            \EndIf
+        \EndFor
+    \EndFor
+\EndWhile
+\State $CS\gets CS\cup CS_{iter}$
+\doWhile {$CS_{iter}\neq \varnothing$}
+\State \Return{$CS$}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[ht]
+\begin{algorithmic}
+    \State \textbf{Input}: a logic program $P$, a set of state transitions $E$, an unsatisfied element $(\alpha,\omega)$, a reachable set $Re$
+    \State \textbf{Output}: modified logic program $P'$ or $\varnothing$ if not revisable
+    \State Initialization: $Rev\gets\{\omega\}$
+    \Do
+    \State $RS\gets \varnothing$
+    \For{$R\in P$}
+        \If{$h(R)\in Rev$}
+            \State $RS\gets RS\addset{R}$
+        \EndIf
+    \EndFor
+    \For{$R\in RS$}
+        \For{$R'\in ls(R)$}
+            \State $P'\gets P\addset{R'}\miset{R}$
+            \If{$P'$ is consistent with $E$ and $P'$ satisfies $Re$}
+                \If {$reach(\alpha,\omega)=\false$}
+                    \State\Return $P'$
+                \EndIf
+            \EndIf
+        \EndFor
+    \EndFor
+    \For{$R\in RS$}
+        \State $Rev\gets b(R)$
+    \EndFor
+    \doWhile{$RS\neq \varnothing$}    
+\end{algorithmic}
+\caption{Specialization}\label{alg:specialization}
+\end{algorithm}
+
+\begin{algorithm}[ht]
+\begin{algorithmic}
+    \State \textbf{Input}: a logic program $P$, a set of state transitions $E$, an unsatisfied element $(\alpha,\omega)$, an unreachable set $Un$
+    \State \textbf{Output}: modified logic program $P'$ or $\varnothing$ if not revisable
+    \State Initialization: $Rev\gets\{\omega\}$
+    \Do
+    \State $RS\gets \varnothing$
+    \For{$R\in P$}
+        \If{$h(R)\in Rev$}
+            \State $RS\gets RS\addset{R}$
+        \EndIf
+    \EndFor
+    \For{$R\in RS$}
+        \For{$R'\in lg(R)$}
+            \State $P'\gets P\addset{R'}\miset{R}$
+            \If{$P'$ satisfies $Un$}
+                \If {$reach(\alpha,\omega)=\true$}
+                    \State\Return $P'$
+                \EndIf
+            \EndIf
+        \EndFor
+    \EndFor
+    \For{$R\in RS$}
+        \State $Rev\gets b(R)$
+    \EndFor
+    \doWhile{$RS\neq \varnothing$}    
+\end{algorithmic}
+\caption{Generalization}\label{alg:generalization}
+\end{algorithm}
+
+\chapter{Theorems and Proofs}\label{sec:proof}
+\begin{theorem}[Change rate of sigmoid function]
+    Sigmoid function $S(x)={\dfrac {1}{1+e^{-x}}}$ on $\mathbb{R}$ is monotonically increasing and its change rate is high around $x=0$.
+    \begin{proof}
+    The derivative of $S(x)$ is $S'(x)=\dfrac{1}{e^x+e^{-x}+2}>0$, thus $S(x)$ is monotonically increasing.
+    
+    The second derivative of $S(x)$ is $S''(x)=\dfrac{e^{-x}-e^x}{(e^x+e^{-x}+2)^2}$, $S''(x)=0$ iff $x=0$, thus the change rate of $S(x)$ reaches its maximum at $x=0$ and is high around $x=0$.
+    \end{proof}
+\end{theorem}
+
+\begin{theorem}[Future states of synchronous semantics]
+    There are at most $O(3^m)$ possible future states for a system of synchronous update scheme if the number of total states of all the variables is fixed, where $m$ is the number of different variables in all the heads of fireable transitions and $x$ is the max number of qualitative levels in the system. 
+    \begin{proof}
+         For every variable, there are at most $x$ future states and the sum number of states of all variables is constant $xm=C$.
+         
+         The amount of future states is $f(x)=x^{\frac{C}{x}}$, $f'(x)=\frac{C}{x}(1-\ln x)$, for $x>0$, $f(x)$ takes its maximum at $x=e$.
+         As $x$ is integer, we take the nearest value $x=3$.
+         Considering that $C$ is also integer, the maximum of $f(x)$ is
+         $
+         \begin{cases}
+         3^{\round{\frac{C}{3}}}&\text{ if } C\equiv 0 \pmod 3\\
+         3^{\round{\frac{C}{3}}-1}\times 4&\text{ if } C\equiv 1 \pmod 3\\
+         3^{\round{\frac{C}{3}}}\times 2&\text{ if } C\equiv 2 \pmod 3
+         \end{cases}$
+    \end{proof}
+\end{theorem}
+
+\begin{theorem}[Termination and correctness of PermReach]\label{th:PermReachCorrectness} ~
+    Let $l=(V_\st, V_\sol, E)$ be an SLCG with initial state $\alpha$ and target local state $\omega$ and $k > 0$ be an integer.
+    \begin{itemize}
+        \item The call $PermReach(l,k)$ terminates.
+        \item $PermReach(l,k)=(\false,\varnothing)$ if $\nexists t$ a trajectory in $l$ from $\alpha$ to $\omega$.
+    \end{itemize}
+    
+    \begin{proof}
+        \begin{enumerate}
+            \item The algorithm starts by breaking the cycles in the SLCG and according to Theorem~\ref{th:break_cycle} it terminates and does not affect the reachability of $\alpha$ in $l$.
+            \item Then all the nodes of $V_\st$ (resp. $V_\sol$) with no (resp. missing) outgoing edges are removed.
+            Such nodes cannot be part of a trajectory leading to initial state $\alpha$ and thus this operation does not affect the reachability of $\alpha$ in $l$.
+            The internal for loop of this operation iterates over $V_\st$ which is finite.
+            To continue looping, it requires one state deletion thus this operation will terminate at least when $V_\st$ becomes $\varnothing$.
+            \item $PermReach(l,k)=\false$ if $\nexists t$ a trajectory in $l$ from $\alpha$ to $v \in V_\sol$.
+            \item The call $PermReach(l,k)$ terminates.
+            \item After this preprocessing, pseudo reachability is checked and according to~\cite{pauleve2012}, it terminates and is correct.
+            It is the only possibility for $PermReach$ to output $\false$.
+            \item Stochastic search follows by randomly reducing each \textbf{OR gate} of $l$ to one of its edges to form $l'$.
+            This operation is run a finite time $k$ and iterates over $V_\st$ which is finite and thus it terminates.
+            This operation does not create new edges, \textit{i.e.} $E' \subseteq E$.
+            $PermReach(l')$ traverses the permutations of \textbf{AND gates} and generates trajectories of $l'$ leading to $\alpha$.
+            The number of permutations is finite and thus $PermReach(l')$ terminates.
+        \end{enumerate}
+    \end{proof}
+\end{theorem}
+
+\begin{theorem}[Complexity of PermReach]\label{th:PermReachComplexity}
+    Let $l=(V_\st,V_\sol, E)$ be an SLCG with initial state $\alpha$ and $k > 0$ be an integer.
+    Let $s=|V_\sol|$ be the number of target state of $l$.
+    Let $v = |V_\st|$ be the number of vertices of $l$.
+    Let $e=|E|$ be the number of edges of $l$.
+    The complexity of $PermReach(l,k)$ is $O(v + s + e + (v+s) / 2 \times v \times e \times s + v^{2} \times e + v \times e + k \times (v \times e^{2} + \frac{v}{2}!))$ which is bounded by $O(k \times \frac{v}{2}!)$.
+    \begin{proof}
+    \begin{enumerate}
+    
+        \item  The computation of $SCC(l)$ has a complexity of $O(v + s + e)$.
+        In the worst case, $|SCC(l)| = (v+s) / 2$ and breaking one cycle of $SCC(l)$ is of $O(v \times e \times s)$, thus the complexity of removing cycle is of $op1=O(v+ e + s + (v+s) / 2 \times v \times e \times s)$.
+        
+        \item To remove useless nodes, $PermReach$ iterates over all local states and checks if one local state has no successor in $l$ which requires to iterates over all edges.
+        In the worst case, all the local states will be removed one by one and thus the complexity of this operation is $op2=O(v \times (v+s) \times e)$.
+        
+        \item Computing pseudo reachability over $l$ which has no loop corresponds to performing a depth-first search on all the branches of a tree and thus is bounded by $op3=O((v+s) \times e)$.
+        
+        \item The stochastic search iterates at most $k$ times.
+        Treating each \textbf{OR gate} to form $l'$ has a cost of $O(v \times e \times e)$.
+        $Permsolve(l')$ generates the permutations of each \textbf{AND gate} to assemble a trajectory can prove reachability of $\omega$ in $l'$.
+        In the worst case, $l$ has only one \textbf{AND gates} containing all the components of $V_\st\setminus\alpha$.
+        The number of total order is $O(\frac{v}{2}!)$.
+        Thus $Permsolve(l')$ is bounded by $O(\frac{v}{2}!)$ and the whole stochastic search by $op4=O(k \times (v \times e^{2} + \frac{v}{2}!))$.
+           
+        \end{enumerate}
+        Conclusion 1: The complexity of $ASPReach(l,k)$ is $O(op1 + op2 + op3 + op4) = O(v + e + s + (v+s) / 2  \times v \times e \times s + v \times (v+s) \times e + v \times e + k \times (v \times e^{2} + \frac{v}{2}!))$.
+        
+        Conclusion: The complexity of $ASPReach(l,k)$ is bounded by $O(k \times \frac{v}{2}!)$.
+    \end{proof}
+\end{theorem}
+
+
+\begin{theorem}[Termination and correctness of ASPReach]\label{th:ASPReachCorrectness} ~
+    Let $l=(V_\st, V_\sol, E)$ be an SLCG with initial state $\alpha$ and target local state $\omega$ and $k > 0$ be an integer.
+    \begin{itemize}
+        \item The call $ASPReach(l,k)$ terminates.
+        \item $ASPReach(l,k)=(\false,\varnothing)$ if $\nexists t$ a trajectory in $l$ from $\alpha$ to $\omega$.
+        \item $ASPReach(l,k)=(\true,t)$ only if $\exists t$ a trajectory in $l$ from $\alpha$ to $\omega$.
+    \end{itemize}
+    
+    \begin{proof}
+    
+        The correctness of preprocessing is analogous to Theorem~\ref{th:PermReachCorrectness}.
+        
+        After the preprocessing, we obtain a sub SLCG $l'=(V'_\st, V'_\sol, E')$.
+        $ASPsolve(l')$ generates all the possible trajectories of $l'$ leading to $\alpha$.
+        The number of possible trajectory is finite and thus $ASPsolve(l')$ terminates.
+        
+        When $ASPsolve(l')=(\true,t)$, $t$ is a trajectory of $l$ proving reachability of $\alpha$ in $l$ and it is the only possibility for ASPReach to output $\true$.
+        $ASPReach(l,k)=(\mathrm{\true},t)$ only if $\exists t$ a trajectory in $l$ from $\alpha$ to $v \in V_\sol$.
+    \end{proof}
+\end{theorem}
+
+\begin{theorem}[Complexity of ASPReach]\label{th:ASPReachComplexity}
+    Let $l=(V_\st,V_\sol, E)$ be an SLCG with initial state $\alpha$ and $k > 0$ be an integer.
+    Let $s=|V_\sol|$ be the number of target state of $l$.
+    Let $v = |V_\st|$ be the number of vertices of $l$.
+    Let $e=|E|$ be the number of edges of $l$.
+    The complexity of $ASPReach(l,k)$ is $O(v + s + e + (v+s) / 2 \times v \times e \times s + v^{2} \times e + v \times e + k \times (v \times e^{2} + \frac{v}{2}!))$ which is bounded by $O(k \times \frac{v}{2}!)$.
+    \begin{proof}
+    \begin{enumerate}
+        \item The complexity of preprocessing is analogous to the one in Theorem~\ref{th:PermReachComplexity},
+        
+        $op1=O(v+ e + s + (v+s) / 2 \times v \times e \times s)$
+        
+        $op2=O(v \times (v+s) \times e)$
+        
+        $op3=O((v+s) \times e)$
+        
+        \item The stochastic search iterates at most $k$ times.
+        Treating each \textbf{OR gate} to form $l'$ has a cost of $O(v \times e \times e)$.
+        $ASPsolve(l')$ generates the trajectories within the SLCG that can prove reachability of $\omega$ in $l'$.
+        Each trajectory is a sequence where each element of $V_\st$ appears exactly once.
+        As ASP solver is a black-box system, we assume it solves the problem by pure brute force search.
+        
+        \item In the worst case, $l'=l$ and all the components of $v_s\in V_\st\land v_s\notin\alpha$ are placed in one \textbf{AND gate}.
+        The number of total order is $O(\frac{v}{2}!)$.
+        Thus $ASPsolve(l')$ is bounded by $O(\frac{v}{2}!)$ and the whole stochastic search by $op4=O(k \times (v \times e^{2} + \frac{v}{2}!))$.
+        \item  Conclusion: The complexity of $ASPReach(l,k)$ is $O(op1 + op2 + op3 + op4) = O(v + e + s + (v+s) / 2  \times v \times e \times s + v \times (v+s) \times e + v \times e + k \times (v \times e^{2} + \frac{v}{2}!))$ and $ASPReach(l,k)$ is bounded by $O(k \times \frac{v}{2}!)$.
+        \end{enumerate}
+    \end{proof}
+\end{theorem}
+
+
+\begin{definition}[Rank of digraphs]\label{def:rank}
+Given a digraph $G=(V,E)$, $\forall v\in V$ is associated with a rank $rk(v)\in \mathbb{N}$ s.t. $\forall v_1,v_2\in V$, if $rk(v_1)<rk(v_2)$, $\nexists (v_1,v_2)\in E$, and if $rk(v_1)=rk(v_2)$, there exist paths $\gamma(v_1,v_2)$ and $\gamma(v_2,v_1)$.
+\end{definition}
+\begin{remark}
+There does not necessarily exist a path starting from a node with higher rank to another node with lower rank.
+The rank of digraphs is a numbering that only offers possibilities of traversing the whole graph without violating a unified direction.
+\end{remark}
+
+
+\chapter{Pure ASP reachability analyzer}\label{chap:pureASP}
+\section{Pure ASP Implementation}\label{sec:pureASP}
+Ben Abdallah \textit{et al.} \cite{abdallah2015exhaustive} have implemented reachability analysis using pure ASP approach (brute force search) and have done the comparison between the state-of-the-art methods of 2015.
+
+\begin{table}[ht]
+    \centering
+    \footnotesize
+    \begin{tabular}{c|c|c|c|c|c|c}
+        Model-target & \#automata & ASP-Th & Pint & libddd & GINsim & ASPi-PH\\
+        \hline
+        ERBB-whole & 20& 2.4s& out& 1m55s& 2m32s& 12s\\
+        \hline
+        ERBB-sub& 20& 2.6s& 0.03s& 1m55s& -& 5s\\
+        \hline
+        TCR-whole& 40& - &Inconc& out& out& 4m28s\\
+        \hline
+        TCR-sub& 40 &- &0.02s& out& -& 1m35s
+    \end{tabular}
+    \caption[Performance of pure ASP method]{Compared performances of Rocca et al. method~\cite{rocca2014asp} denoted by ASP-Th, Pint, libddd, GINsim and our new iterative method ASP-PH}
+    \label{tab:pureAsp}
+\end{table}
+
+Table \ref{tab:pureAsp} shows pure ASP style methods (ASP-Th and ASPi-PH) are still costly compared to PermReach and ASPReach.

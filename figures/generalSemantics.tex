@@ -1,0 +1,26 @@
+\begin{tikzpicture}[scale=0.87,line width=1pt]
+\node (u) at (3.5,0) {\small $u$};
+\node (v) at (0,2.5) {\small $v$};
+\draw[->] (0,0) -- (u);
+\draw[->] (0,0) -- (v);
+\draw[step=1] (0,0) grid (3,2);
+\foreach \x in {0,1,2}
+\node at ($(\x,0)+(0.5,0)$)[anchor=north] {\small $\x$};
+\foreach \y in {0,1}
+\node at ($(0,\y)+(0,0.5)$)[anchor=east] {\small $\y$};
+\node (00) at (0.5,0.5) {};
+\node (10) at ($(00)+(1,0)$) {};
+\node (20) at ($(10)+(1,0)$) {};
+\node (01) at ($(00)+(0,1)$) {};
+\node (11) at ($(01)+(1,0)$) {};
+\node (21) at ($(11)+(1,0)$) {};
+\draw[->,color=blue] (00) -- (10);
+\draw[->,color=blue] (10) -- (20);
+\draw[->,color=blue] (10) -- (11);
+\draw[->,color=red] (10) -- (21);
+\draw[->] (20) -- (21);
+\draw[->] (01) -- (00);
+\draw[->] (11) -- (01);
+\draw[->] (2.6,1.4) arc (-90:240:0.25);
+\draw[->,color = red] (00) to [bend right] ($(20)+(0.1,0)$);
+\end{tikzpicture}

@@ -1,0 +1,45 @@
+\begin{tikzpicture}[aS]  
+  	
+  	\startl{a_1};
+    \node[Asol,left of=a_1] (a_1s1){};
+    \node[Aproc, above left = 0.6cm of a_1s1] (d_1){$d_1$};
+    \node[Aproc, below left = 0.6cm of a_1s1] (e_1){$e_1$};
+    \node[Asol, left of = d_1](d_1s){};
+    \node[Asol, left of = e_1](e_1s){};
+    \node[Aproc, left = 0.6cm of e_1s] (d_0){$d_0$};
+    \node[Aproc, left = 0.6cm of d_1s] (e_0){$e_0$};
+    \node[Asol, left of = d_0](d_0s){};
+    \node[Asol, left of = e_0](e_0s){};
+    \node[Assol, left = 0.6cm of d_0s](d_0st){$\varnothing$};
+    \node[Assol, left = 0.6cm of e_0s](e_0st){$\varnothing$};
+    \node[right = 0.1cm of a_1s] {AND};
+    \node[left = 0.1cm of a_1s1] {AND};
+    \node[above = 0.1cm of a_1] {OR};
+    \path 
+    (a_1s1) edge (d_1)
+    (a_1s1) edge (e_1)
+    (d_1) edge (d_1s)
+    (e_1) edge (e_1s)
+    (d_1s) edge (e_0)
+    (e_1s) edge (d_0)
+    (d_0) edge (d_0s)
+    (e_0) edge (e_0s)
+    (d_0s) edge (d_0st)
+    (e_0s) edge (e_0st)
+    (a_1) edge (a_1s1)
+    ; 
+  	\specl{above}{a_1}{b_1};
+  	\link{b_1}{c_0};
+  	\node[Asol, right of = c_0](c_0s){};
+    \node[Assol, right = 0.6cm of c_0s](c_0st){$\varnothing$};
+  	%\edl{c_0};
+  	\specl{below}{a_1}{c_1};
+	\link{c_1}{b_0};
+	\node[Asol, right of = b_0](b_0s){};
+    \node[Assol, right = 0.6cm of b_0s](b_0st){$\varnothing$};
+  	%\edl{b_0};
+  	\path
+  	(b_0s) edge (b_0st)
+  	(c_0s) edge (c_0st)
+  	;
+\end{tikzpicture}

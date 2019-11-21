@@ -1,0 +1,128 @@
+\chapter{Conclusion and Outlooks}\label{chap:conclusion}
+\begin{mybox}
+We will recap in this chapter what have been discussed during this thesis and propose some possible future work.
+We answered the two questions in Section~\ref{sec:problemStatement}, how to analyze the reachability efficiently and precisely (Chapter~\ref{chap:refinement}) and how to build a model by given time series data and reachability information (Chapter~\ref{chap:modelInference}).
+
+\end{mybox}
+
+With the increasing amount of biological data, the needs of analyzing, extracting knowledge and predicting system behaviors based on these data is becoming crucial.
+Modeling is one of the ways to answer all these needs by collecting, classifying, analyzing the common features of the data and make reasonable prediction.
+
+The application of modeling in biological engineering can be diverse. 
+By analyzing the mechanics of a cell or a bacterium, one may locate the gene to be knocked-off or knocked-in in order to let the system perform his desired system behaviors;
+by analyzing the interaction between human body and medicine in molecular scale, one may ameliorate existing targeted therapies or design new ones;
+in pharmaceutics, a thorough understanding of bio-chemical reactions allows one to design new medicine or new synthesis processes.
+
+As also mentioned in the introduction chapter, robotic models are also of importance.
+For a non black-box system, model checking is helpful to controlling the system \textit{via} setting specific initial states, ensuring system safety and robustness.
+
+In robotics, one prefers synchronous models as every move of a robot is programmed, the system parameters are usually accessible.
+However modelings in systems biology are different.
+Since the inner mechanics of biological systems are usually unknown, or partially known and biological systems have intrinsic non-determinism (\textit{e.g.} cell differentiation), 
+these two facts suggest us to consider a non-deterministic model.
+As discussed in Section~\ref{sec:semantics}, asynchronicity can nearly impose non-determinism.
+Moreover, to avoid the solution of differential equations and tolerate some noise, discretized models are preferred.
+In all, \textit{asynchronous  modelings} are used in the most of this thesis.
+
+\section{Contributions}
+
+Based on the background of systems biology, our goal is to \textit{enrich and correct} the existing models with additional knowledge.
+To do so, we have to first develop efficient model checkers to verify whether the model is consistent with qualitative properties such as reachability (Chapter~\ref{chap:refinement}).
+
+In Section~\ref{sec:modelchecking}, we stated that exact model checkers provide conclusive results of dynamic properties but the computational cost is unaffordable while the computational cost of abstract model checkers are acceptable but the results are not necessarily conclusive.
+
+With the previous work on the Asynchronous Automata Network (AAN) by Paulev\'e \textit{et al.} \cite{folschette2015},
+we squeeze the application domain of AAN and simplified its semantics, called ABAN (Asynchronous Binary Automata Network).
+This semantic change is to give a possibility of making related reachability analyzer more conclusive.
+
+Our research focuses on a static analysis called \textit{over-approximation} of the system dynamics as this abstract method relies on only topological information of the model instead of simulation.
+We also proposed Simplified Local Causality Graph (SLCG) to visualize the static analysis on ABANs.
+The computation is efficient but still inconclusive.
+
+However, the result can be used in the refined analysis if it is not conclusive.
+%the condition of the adverse under-approximation is too strict.
+During the theoretical analysis of the reason of inconclusiveness of the over-approximation, we developed two model checkers to deal with the key components impeding conclusiveness.
+They are based on heuristic methods and pure static analysis:
+\begin{itemize}
+    \item PermReach (Section~\ref{sec:permreach})
+    
+        which performs a \textit{limited search of permutations} on conjunctive nodes in the SLCG as the existence of conjunctive node is one of the factor of inconclusiveness.
+        Since PermReach does not take the nodes appearance orders into account, the analysis remains theoretically inconclusive.
+    \item ASPReach (Section~\ref{sec:aspreach})
+        
+        which performs a \textit{global search of possible nodes} order in the SLCG with the help of Answer Set Programming (ASP).
+        ASPReach covers the weak-point of PermReach but is still inconclusive due to the heuristic preprocessing which simplifies the problem but creates inequivalence.
+\end{itemize}
+
+PermReach and ASPReach perform normally on models with $1000$ components while traditional model checkers fail to compute and static analyzer Pint also fails to give conclusive results on certain instances (Section~\ref{sec:compReachAnalyzers}).
+Moreover, ASPReach is more conclusive than PermReach but need extra runtime.
+
+As a tentative, we tried to extend the application of PermReach and ASPReach to multi-valued models (restricted AAN).
+However, this extension requires a presumption which is not realistic enough in biological systems but remains to be an interesting heuristics when the requirement is to find only one reachable trajectory instead of a global solution (Section~\ref{sec:extentionMultiValue}).
+
+Next, with the unsatisfied properties detected by our model checkers, we need a way to correct the model in order to make the system consistent with all the wanted properties (Chapter~\ref{chap:modelInference}).
+
+Finally, we provide with two model learning/revision techniques based on reachability analysis, covering the incapability of taking background knowledge into account.
+
+\begin{itemize}
+    \item CRAC (Completion \textit{via} Reachability And Correlations)
+    
+    first applies ordinal differential equation model to generate regulation candidates.
+    Then it tries to satisfy all the reachability requirements by adding/deleting transitions in the model according to the regulation candidates.
+    
+    \item M2RIT (Model Revision \textit{via} Reachability and Interpretation Transitions)
+    
+    is a strengthening to the capability of LFIT (Learning From Interpretation Transitions) framework to the learning of Boolean asynchronous systems in the form of logic programs.
+    Unlike CRAC, M2RIT uses the reproducibility as a constraint.
+    When changing the transitions in the model, the model has to always be able to reproduce the original time-series data.
+\end{itemize}
+
+As far as we know, the revision of dynamic model based on reachability properties has never been considered in the literature.
+To our knowledge, this field has been explored only by Yamamoto \textit{et al.}~\cite{yamamoto2014completing}, who have studied the completion of static models limited by \textit{static} data.
+
+CRAC and M2RIT are able to deal with models of $1000$ variables thanks to the high performance of ASPReach.
+However they are not theoretical conclusive as they are built on heuristics, possessing risks of failure.
+
+Moreover, even though M2RIT can precisely reproduce all the provided time-series data, it is sensitive to noise, inheriting the fragility of LFIT.
+
+After all, to enhance learning methods, we need a lot of studies to prove the causality instead of correlation/consistency by fitting the data.
+
+To sum up the contents in this thesis, we have:
+
+\begin{enumerate}
+    \item studied different modeling frameworks and semantics
+    \item investigated the weakness of existing model checkers and model learning methods
+    %\item modified/improved models interpretations to adapt to the transitions with different delays
+    \item developed reachability analyzers PermReach and ASPReach
+    \item developed model revisors CRAC and M2RIT
+\end{enumerate}
+
+\section{Future Work}
+
+\begin{itemize}
+    \item From the analysis of the drawbacks of PermReach and ASPReach, we assert that the way towards high efficiency and precision is probably hybrid analysis where the needs of precision and effectiveness meet.
+    
+    We propose to use more accurate heuristics (for example at the choice on \textbf{OR gates} of an SLCG) instead of random choice so as to access branches with higher possibility of reachability.
+
+    \item We studied only Boolean-related models in order to use a stronger conclusiveness of SLCG. 
+    It is however possible to generalize the study to multi-valued systems.
+    
+    Normal Logic Program (NLP) might be a proper modeling because it ignores the state of departure while different pathways of a variable might be a cause of inconclusiveness.
+    For example, transition $a_1\to b_0\Rsh b_2$ has multiple pathways for automaton $b$: $b_0\to b_2, b_0\to b_3\to b_2$, \textit{etc}.
+    When this transition is translated to $b_2\gets a_1$, it does not require $b_0$ as a state of departure which does not cause such problems.
+    
+    %\item More applications to biology
+    \item We are now considering the incorporation of parametrization space abstraction, like the work of \cite{PRNs-TCS18}, to improve the performance of our model checkers/revisors regarding versatility.
+    
+    The study of parametrization space allows us to obtain different properties of a set of models rather than only squeezing consistent transitions only by reachability properties.
+    Also, parametrization space methods is still restrictive: they can explore the full dynamics up to dozens of variables.
+    New model checkers with versatility and less time or memory cost may be interesting.
+    
+    
+    \item M2RIT does not guarantee the minimal revision of the logic program.
+    
+    Considering the metric for minimal revision and designing a related algorithm will be interesting.
+    The definition of ``minimal'' can be of different means: allowing changing minimal number of transitions, allowing modifying minimal number of elements of each transition or allowing least inconsistency, \textit{etc}.
+    Also, when revising the models, there might be some common parts in the SLCGs of inconsistent reachability properties.
+    Making use of these common parts might be useful to reaching the goal of minimal revision.
+\end{itemize}

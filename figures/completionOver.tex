@@ -1,0 +1,29 @@
+\def\dist{1.9}
+\begin{minipage}{0.45\linewidth}
+\centering
+\begin{tikzpicture}
+\node (c) [draw,circle] at (0,0) {$c$};
+\node (a) [draw,circle] at (\dist,0) {$a$};
+\node (b) [draw,circle] at (2*\dist,0) {$b$};
+\draw[->, line width = 1pt, shorten >=1pt] (a) to [bend left] (b);
+\draw [-Bar,line width = 1pt,shorten >=1pt] (c) to [bend left] (a);
+\end{tikzpicture}
+\end{minipage}
+\hfill
+\begin{minipage}{0.5\linewidth}
+\centering
+\begin{tikzpicture}
+\TSort{(0,0)}{c}{2}{l}
+\TSort{(\dist,0)}{a}{2}{r}
+\TSort{(2*\dist,0)}{b}{2}{r}
+\THit{a_1}{}{b_0}{.west}{b_1}
+\THit{c_0}{dashed,thick,color=red}{a_0}{.west}{a_1}
+
+
+\path[bounce,bend left]
+\TBounce{b_0}{}{b_1}{.west}
+\TBounce{a_0}{thick,color=red}{a_1}{.west}
+;
+\TState{a_0,b_0,c_0}
+\end{tikzpicture}
+\end{minipage}

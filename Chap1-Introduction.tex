@@ -1,0 +1,154 @@
+\chapter{Introduction}\label{chap:intro}
+\begin{mybox}
+In the domain of systems biology, more big data are becoming available with the development of biotechnology.
+However, extracting information from such big data could be difficult due to its high computational complexity and the potential fuzziness of biological systems.
+Modelings and their related analytic techniques are drawing increasing attention.
+The dilemma of efficiency and precision always persists.
+
+This thesis is dedicated to attacking this dilemma by proposing our modeling framework and its related dynamic properties analyzers as well as model learning methods.
+\end{mybox}
+
+\section{Context and Motivations}
+
+In the studies of concurrent systems, modeling is an inevitable topic.
+The modeling frameworks discussed in this thesis are all designed for biological use and some features are drawn from biology but they can be potentially useful in other domains, \textit{e.g.} robotics, human engineering.
+
+Models are supposed to represent the operations of a real system and help one to access, analyze and control the real system. 
+It is a tool to help people to understand the interaction of the components in real systems and the integral behavior of the systems.
+
+A good model is a model which:
+
+\begin{itemize}
+    \item is consistent with the corresponding real system
+    
+    The model reproduces certain important behaviors.
+    In the ideal situation, the model bisimulates the real system.
+    \item is observable
+    
+    To allow one to verify the behaviors, the state (historical, current and future) and the mechanics of the model have to be observable.
+    
+    \item allows one to access the I/O of the model
+    
+    With full control of the I/O, we can carry some unfeasible tests in real system as the mechanical of the model is known.
+    %\item allows one to access the state (historical, current and future) of the model
+    \item has related analyzers of various properties
+    
+    Some properties are not verifiable via finite enumeration.
+    \item can be translated from/to other models 
+\end{itemize}
+
+Normally, the above metrics are self-constrained:
+The finer the model is, the bigger the computational complexity is (simulation, verification, \textit{etc.}).
+In this thesis, we focus on modelings, their related analyzers of system properties and model revision based on these properties.
+
+\subsection{Models in Computational Biology}
+Systems biologists are interested in highly abstracted models because they need abstract representation and/or flexibility to make model compatible with unknown biological knowledge.
+
+Tractability with big data is also important.
+``Big'' refers to two meanings: one is that biological systems can be huge, with enormous number of components and interactions in between; another is that the number and the size of data sets can be huge.
+
+To model the real system, we need components to represent genes, RNA messengers, proteins, metabolites, \textit{etc}.
+At this stage, we can carry out a first-step abstraction.
+The synthesis of proteins is under the instruction of RNA messengers which are synthesized according to genes.
+This linear process allows  to compress the three entities into one.
+Their inner behaviors (\textit{e.g.} protein phosphorylation, activation/inhibition of genes) are characterized by the values of the associated entities.
+
+\subsection{Classification of Models}
+
+The values in models can be continuous or discrete which differentiate the modeling frameworks.
+
+Continuous %\roux{Continue}{Continuous}
+ values correspond directly to the measurement and can be used in the models based on the family of Ordinary Differential Equation (ODE), for example Stochastic Differential Equation (SDE), Delay Differential Equation (DDE).
+
+Discrete values come from an approximation from sigmoid function to step functions. 
+Sigmoid function is a monotonic function and its change rate is high around a certain point (Proof in Appendix~\ref{sec:proof}).
+Many biological behaviors are similar with sigmoid functions: certain entity starts to influence the system if its value goes beyond a certain threshold.
+If the value is far from the threshold, it is either insufficient (low level) or saturated (high level)~\cite{kauffman1969,von2000segment}.
+This fact inspires scientists to study discrete models.
+One can encode low level as $0$ and high level as $1$ or even add additional discrete levels to represent more behaviors.
+
+In the term of concurrency, synchronous models make components to evolve at the same time while asynchronous ones allow at most one component to evolve at one time.
+Due to the fuzziness of biological system, asynchronous models are compatible with more configurations of system parameters~\cite{bernot2009}.
+
+However, the compatibility of asynchronous models is also a shortcoming as they explore more state space at each system transition compared with synchronous ones.
+The exploration of state space leads to so-called state space explosion problem.
+To deal with such problem, Paulev\'e \textit{et al.} proposed the Process Hitting framework and its related static model checker~\cite{pauleve2012} and Folschette \textit{et al.} proposed Asynchronous Automata Network enriching model semantics~\cite{folschette2015}.
+In this thesis, we mainly work on \textbf{asynchronous discrete models} based on the models above.
+
+\subsection{Model Checking}
+If one has an existing model, he might want to know what kind of properties this model satisfies, such as fixed points, safety, reachability.
+
+As stated in the beginning of this chapter, verifying such properties in a concurrent system is costly in computation (PSPACE-complete)~\cite{harel2002complexity}.
+We have to make a compromise on either efficiency or precision: exact analyzers are precise but need to traverse big state space; abstract analyzers solve a simplified version of the original problem so that the solution is not equivalent to the one %\roux{that}{one}
+ of the original problem.
+
+\subsection{Model Learning}
+Models are built by the biological knowledge, obtained either by certain experiments, either by generalized conclusions from biologists.
+
+Model learning turns the data coming from biological experiment into model parameters, if the modeling framework is given.
+We will focus on the LFIT-based method (Learning From Interpretation Transition) proposed by Ribeiro \textit{et al.}~\cite{ribeiro2015learning,ribeiro2018learning,ribeiro2017inductive}.
+LFIT is a precise learning technique which takes all the inputs into account.
+
+However, model learning is not enough, as we are not sure the resulted models are consistent with empirical conclusions.
+
+\section{Problem Statement}\label{sec:problemStatement}
+
+With the background of model checking and model learning, we can now formulate the two main problems of this thesis:
+\begin{itemize}
+    \item How to analyze efficiently (less runtime) and precisely (less false positive/negative rate) the reachability properties within an asynchronous discrete model?
+    
+    \item How to build a model from time-series data such that the model satisfies desired reachability properties?
+    
+    
+\end{itemize}
+
+
+
+\section{Contributions}\label{sec:contribution}
+The main contributions corresponding to the problems are the followings:
+\begin{itemize}
+    \item Development of efficient and precise heuristic reachability analyzers based on static analysis~\cite{chai2018reach}
+    %\item Design of model learners using time-series data
+    \item Design of model revisers: using \textit{a priori} knowledge and reachability properties to revise existing models
+\end{itemize}
+
+This thesis aims at solving the problems in the last sections by refining existing modeling frameworks and learning approaches:
+
+\textbf{Reachability analyzers}
+
+To solve both the state space explosion problem and the unsatisfying precision of pure static analysis, we developed two approaches based on static analysis with different weights on \textit{efficiency} and \textit{precision}.
+
+\textbf{Model Revisers}
+
+As far as we know, model revision based on reachability properties has never been considered in the literature.
+According to the problems of model inference above, we designed two algorithms:
+\begin{itemize}
+    \item an algorithm based on learning from \textbf{raw} time-series data
+    
+    This algorithm uses correlation coefficients to infer the correlations between the change rate of each variable and other variables in order to suggest hypothetical regulations of the system.
+    With the hypothetical regulations and \textit{a priori} biological knowledge, we can revise incomplete models by adding transitions consistent with the real system.
+    \item an algorithm based on learning from \textbf{discretized} time-series data
+    
+    The learning approach we applied is the one using Inductive Logic Programming~\cite{ribeiro2018learning}.
+    This approach has more strict rule constraints, the model is either consistent with the original time-series data or not.
+    We try to revise the model in order to make it consistent with \textit{a priori} biological knowledge and the rule constraints at the same time.
+\end{itemize}
+
+
+\section{Organization of the Manuscript}
+Chapter~\ref{chap:stateOfTheArt} introduces the state of the art on several modeling frameworks, model checkers, different update schemes of modelings and model learning/revision techniques.
+We are especially interested in Asynchronous Automata Network, reachability analysis and the learning from state transitions.
+
+Chapter~\ref{chap:refinement} presents our modeling framework adapted from Automata Network and its relating reachability analyzers based on static analysis.
+We will focus on the inconclusive cases of pure static analysis and analyze the key components preventing from a direct solution.
+We then apply some different heuristics on the key components to solve them dynamically in order to reach a conclusive result on the reachability problem.
+
+Chapter~\ref{chap:modelInference} presents the methodology of model revision in this thesis and our model revisers mentioned above.
+These model revisers perform a model selection. 
+They choose a model from the candidates satisfying all the provided constraints.
+However the number of candidate models can be huge%\roux{exponential}{huge}
+, our model revisers can shrink the search space drastically to obtain a result.
+
+Chapter~\ref{chap:test} shows some comparative and exploratory tests and their results on the approaches presented in Chapter~\ref{chap:refinement} and Chapter~\ref{chap:modelInference}.
+
+Chapter~\ref{chap:conclusion} concludes the whole thesis.

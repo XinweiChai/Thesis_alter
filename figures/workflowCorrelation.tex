@@ -1,0 +1,25 @@
+\begin{tikzpicture}[node distance = 1.5cm, auto]
+    % Place nodes
+    \node [block] (originalData) {Time-series data};
+    \node [block, right = of originalData] (dataDiscretization) {Data discretization};
+     \node [block, right = of dataDiscretization] (varReconstruction) {Variable reconstruction};
+    \node [block, below = of originalData] (ranking) {Sorting};
+    \node [block, right = of ranking] (changeRate) {Change rate};
+    \node [block, below = of ranking] (dataReg) {Data regrouping \& Spearman coefficient};
+     \node [block, right = of dataReg] (partialCoeff) {Partial coefficient};
+     \node [block, right = of partialCoeff] (regulations) {Regulations $x\xrightarrow{+/-}y$};
+     \node [block, below = of varReconstruction] (actions) {Transitions \ac{x_i}{y_j}{y_k}};
+     \coordinate [left = of ranking,node distance=0.5cm](abstract);
+    % Draw edges
+    \path [line] (originalData) -- (dataDiscretization);
+    \path [line] (originalData) -- (ranking);
+    \path [line] (originalData) -- (changeRate);
+    \path [line] (changeRate) -- (ranking);
+    \path [line,dashed] (dataDiscretization) -- (varReconstruction);
+    \path [line] (varReconstruction) -- (ranking);
+    \path [line] (ranking) -- (dataReg);
+    \path [line] (dataReg) -- (partialCoeff);
+    \path [line] (partialCoeff) -- (regulations);
+    \path [line,dashed] (regulations) -- (actions);
+    \path [line,dashed] (originalData) -|  (abstract)node[rotate=90,below=2pt]{Pearson Coefficient} |-(dataReg);
+\end{tikzpicture}

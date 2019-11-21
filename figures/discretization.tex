@@ -1,0 +1,37 @@
+\begin{tikzpicture}[scale=0.68]%[scale=0.68]
+    \begin{axis}[domain=0:2*pi,legend pos=north east]
+    %\addplot[samples=12,mark=x,color=red] {sin(deg(x))}; 
+    %\addplot[samples=12,mark=*,color=blue] {cos(deg(x))}; 
+    \addplot[mark=none,color=blue] {sin(deg(x))}; 
+    \addplot[mark=none,color=red] {cos(deg(x))}; 
+    \addplot[mark=none,color=black]{0.5};
+    %\addplot[mark=square,color=black] {0*deg(x)};
+    \addplot[only marks,color=black] coordinates {
+        (0,0)
+        (0.5*pi,0)
+        (pi,0)
+        (1.5*pi,0)
+        (2*pi,0)
+    };
+    \legend{$x=\sin(t)$,$y=\cos(t)$}
+    \end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[scale=0.68]
+    \begin{axis}[domain=0:2*pi,legend pos=north east]
+    \addplot[mark=none,color=blue] {sin(deg(x))}; 
+    \addplot[mark=none,color=red] {cos(deg(x))}; 
+    \addplot[mark=none,color=black]{0.5};
+    \addplot[only marks,color=black] coordinates {
+        (pi/6,0.5)
+        (pi/3,0.5)
+        (5*pi/6,0.5)
+        (5*pi/3,0.5)
+       % (0,0)
+       % (0.5*pi,0)
+       % (pi,0)
+       % (1.5*pi,0)
+       % (2*pi,0)
+    };
+    \legend{$x=\sin(t)$,$y=\cos(t)$}
+    \end{axis}
+\end{tikzpicture}

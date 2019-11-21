@@ -1,0 +1,48 @@
+%\begin{tikzpicture}
+%\TSort{(3,0)}{a}{3}{l}
+%\TSort{(0,0)}{b}{2}{l}
+%\TSort{(6,0)}{c}{2}{r}
+%\TSort{(2,-2)}{d}{2}{b}
+%\THit{b_1}{}{a_0}{.north west}{a_1}
+%\THit{c_1}{}{a_1}{.east}{a_2}
+%\THit{d_0}{distance=90,out=240,in=210}{b_0}{.west}{b_1}
+%\THit{b_1}{}{d_0}{.north}{d_1}
+%\THit{d_0}{distance=90,out=-75,in=-45,dashed,thick,color=blue}{c_0}{.east}{c_1}
+%\THit{c_1}{dashed,thick,color=blue}{d_1}{.north}{d_0}
+%
+%
+%\path[bounce,bend right]	
+%\TBounce{a_1}{}{a_2}{.east}
+%\TBounce{d_1}{thick,color=blue}{d_0}{.north east}
+%\TBounce{c_0}{thick,color=blue}{c_1}{.east}
+%;
+%\path[bounce,bend left]
+%\TBounce{a_0}{}{a_1}{.west}
+%\TBounce{b_0}{}{b_1}{.west}
+%\TBounce{d_0}{}{d_1}{.north west}
+%;
+%\TState{a_0,b_0,c_0,d_0}
+%\end{tikzpicture}
+\begin{tikzpicture}[apdotsimple/.style={apdot}]
+\scriptsize
+\TSort{(0,0)}{a}{2}{l}
+\TSort{(2,0)}{b}{2}{l}
+\TSort{(4,0)}{c}{2}{l}
+\TSort{(6,0)}{d}{2}{l}
+
+% with delays
+\path[local transitions]
+
+	(a_0) edge node[auto] {\{$b_1, c_1$\}} (a_1)
+	
+	(b_0) edge node[auto] {$\{d_0\}$} (b_1)
+	(d_0) edge node[auto] {$\{b_1\}$} (d_1)
+	(d_1) edge[dashed,color=blue] node[auto] {$\{c_1\}$} (d_0)
+	%(c_1) edge node[auto] {$\{b_0\}$, $2$} (c_0)
+	(c_0) edge[dashed,color=blue] node[auto] {$\{d_1\}$} (c_1)
+;
+
+\TState{a_0, b_0, c_0, d_0}
+
+
+\end{tikzpicture}

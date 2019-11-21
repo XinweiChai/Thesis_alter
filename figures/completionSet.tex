@@ -1,0 +1,49 @@
+\begin{tikzpicture}[apdotsimple/.style={apdot}]
+\scriptsize
+\TSort{(0,0)}{a}{2}{l}
+\TSort{(1.7,0)}{b}{2}{l}
+\TSort{(3.4,0)}{c}{2}{l}
+\TSort{(5.1,0)}{d}{2}{l}
+\TSort{(6.8,0)}{e}{2}{l}
+% with delays
+\path[local transitions]
+
+	(a_0) edge node[auto] {\{$b_1, c_0$\}} (a_1)
+	(c_0) edge node[auto] {\{$d_1$\}} (c_1)
+	(a_0) edge[bend right] node[right] {\{$c_1, e_1$\}} (a_1)
+;
+\TState{a_0, b_0, c_0,d_0, e_0}
+\end{tikzpicture}
+
+\begin{tikzpicture}[aS]  
+  	
+  	\startl{a_1};
+    \node[Aproc, below right of = a_1s] (b_1){$b_1$};
+    \node[Aproc, right of = a_1s] (c_0){$c_0$};
+    \node[Asol, right of = c_0](c_0s){};
+    \node[Assol, right of = c_0s](c_0st){$\varnothing$};
+    %\node[Asol, right of = b_1](b_1s){};
+    \node[Assol, right of = b_1](b_1st){$\perp$};
+    \node[Asol, above right of=a_1] (a_1s1){};
+    \node[Aproc, right of = a_1s1] (c_1){$c_1$};
+    \node[Aproc, above right of = a_1s1] (e_1){$e_1$};
+    \node[Asol, right of = c_1](c_1s){};
+    \node[Aproc, right of = c_1s] (d_1){$d_1$};
+    \node[Assol, right of = d_1](d_1st){$\perp$};
+    \node[Assol, right of = e_1](e_1st){$\perp$};
+    \path 
+    (a_1s) edge (c_0)
+    (a_1s) edge (b_1)
+    (c_0) edge (c_0s)
+    (c_0s) edge (c_0st)
+    (b_1) edge (b_1st)
+    %(b_1s) edge (b_1st)
+    (a_1) edge (a_1s1)
+    (a_1s1) edge (c_1)
+    (c_1) edge (c_1s)
+    (c_1s) edge (d_1)
+    (d_1) edge (d_1st)
+    (a_1s1) edge (e_1)
+    (e_1) edge (e_1st)
+    ; 
+\end{tikzpicture}

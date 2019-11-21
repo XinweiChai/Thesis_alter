@@ -1,0 +1,19 @@
+\begin{tikzpicture}[grn,>=stealth]
+\node[inner sep=0] (a) at (0,0) {a};
+\node[inner sep=0] (b) at (2,0) {b};
+\node[inner sep=0] (c) at (2,-2) {c};
+\node[inner sep=0] (d) at (0,-2) {d};
+%\path
+%  node[elabel, below=-1em of a] {$0..2$}
+%  node[elabel, below=-1em of b] {$0..1$}
+%  node[elabel, below=-1em of c] {$0..1$};
+\path[->]
+  (b) edge node[elabel, above=-3pt] {$+1$} (a)
+  (b) edge node[elabel, left=-5pt] {$+1$} (c)
+  (b) edge[bend right] node[elabel, above=-3pt] {$-1$} (d)
+  (c) edge[bend right] node[elabel, right=-3pt] {$-1$} (b)
+  (c) edge node[elabel, above=-5pt] {$+1$} (d)
+  (d) edge node[elabel, left=-3pt] {$+1$} (a)
+  (d) edge node[elabel, below=-3pt] {$-1$} (b)
+  (d) edge[bend right] node[elabel, below=-3pt] {$+1$} (c);
+\end{tikzpicture}

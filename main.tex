@@ -1,0 +1,228 @@
+\documentclass[11pt,twoside,openright]{report}
+%\usepackage[T1]{fontenc}
+%\usepackage[english,french]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage{algcompatible}
+\usepackage[noend]{algpseudocode}
+\usepackage{fancyvrb}
+\usepackage{hyperref}
+\usepackage{subfigure}
+\usepackage{graphicx}
+\usepackage{pgfplots}
+\usepackage{multirow}
+\usepackage{kbordermatrix}
+\usepackage{siunitx}
+\usepackage[framemethod=tikz]{mdframed}
+\usepackage{multicol}
+\usepackage{pdfpages}
+\definecolor{mycolor}{rgb}{0.122, 0.435, 0.698}
+
+\newmdenv[innerlinewidth=0.5pt, roundcorner=4pt,linecolor=mycolor,innerleftmargin=6pt, innerrightmargin=6pt,innertopmargin=6pt,innerbottommargin=6pt]{mybox}
+
+\pgfplotsset{
+    compat=1.15,
+    %every axis legend/.append style={at={(0.5,-0.13)},anchor=north,legend cell align=left},
+    legend pos=north west,
+    legend style={draw=none,
+              text width=0.9in,           %% adjust
+              %minimum height=0.5in,     %% adjust
+              %anchor=center,
+              %cells={anchor=west},
+            },
+    %axis lines=left,
+}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows, automata,calc}
+\usetikzlibrary{er,positioning}
+\tikzstyle{block} = [rectangle, draw, fill=blue!20, 
+    text width=6em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{line} = [draw, -latex']
+
+\newcommand\irregularcircle[2]{% radius, irregularity
+  \pgfextra {\pgfmathsetmacro\len{(#1)+rand*(#2)}}
+  +(0:\len pt)
+  \foreach \a in {10,20,...,350}{
+    \pgfextra {\pgfmathsetmacro\len{(#1)+rand*(#2)}}
+    -- +(\a:\len pt)
+  } -- cycle
+}
+%\usepackage{etoolbox}
+%\apptocmd{\sloppy}{\hbadness 10000\relax}{}{}
+\apptocmd{\thebibliography}{\raggedright}{}{}
+
+\input{macros-ph}
+\input{macros-abstr}
+\input{tikzstyles2}
+\makeatletter
+\def\input@path{{figures/}}
+\graphicspath{{figures/}}
+\makeatother
+\newcommand{\acm}[3]{\{#1\}\rightarrow#3}
+\newcommand{\ac}[3]{$\{#1\}\rightarrow#3$}
+\newcommand{\acmph}[3]{#1\rightarrow#2\Rsh#3}
+\newcommand{\acph}[3]{$#1\rightarrow#2\Rsh#3$}
+\newcommand{\omesi}{^\omega_\alpha}
+\newcommand{\vv}{\mathrm{v}^{val}}
+\newcommand{\dv}[2]{\dfrac{{\rm d}#1}{{\rm d}#2}}
+\newcommand{\ddv}[2]{\frac{{\rm d}#1}{{\rm d}#2}}
+\newcommand{\st}{{\mathrm{state}}}
+\newcommand{\sol}{{\mathrm{sol}}}
+\newcommand{\false}{\mathbf{False}}
+\newcommand{\true}{\mathbf{True}}
+\DeclarePairedDelimiter{\round}{\lfloor}{\rfloor}
+\DeclarePairedDelimiter{\ceiling}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\init}{\langle}{\rangle}
+\DeclarePairedDelimiter{\addset}{\cup\{}{\}}
+\DeclarePairedDelimiter{\miset}{\setminus\{}{\}}
+\theoremstyle{definition}
+
+\newtheorem{definition}{Definition}[chapter]
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{example}{Example}[chapter]
+\newtheorem{proposition}{Proposition}[chapter]
+\newtheorem{remark}{Remark}[chapter]
+%\newtheorem{proof}{Proof}[chapter]
+
+\algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}%
+
+\usepackage{ulem}
+\newcommand{\roux}[2]{{\sout{#1}}{{\color{purple}~#2}}} %\renewcommand{\roux}[2]{{#1}{\phantom{#2}}} ou %\renewcommand{\roux}[2]{{#1}{}
+
+\hyphenation{apprenti-ssage}
+
+
+%\newenvironment{poliabstract}[1]{\renewcommand{\abstractname}{#1}\begin{abstract}}{\end{abstract}}
+%\begin{poliabstract}{R\'esum\'e}
+%   blah blah blah...
+%\end{poliabstract}
+
+\title{Reachability Analysis and Revision of Dynamics of Biological Regulatory Networks
+\\
+\vspace{0.5cm}
+\large Analyse d'accessibilit\'e et r\'evision de la dynamique dans les r\'eseaux de r\'egulations biologiques
+}
+
+\date{April 2019}
+\author{Xinwei Chai}
+\begin{document}
+%\maketitle
+\includepdfmerge{Thesis_cover.pdf,1,3}
+\pagenumbering{roman} 
+\setcounter{page}{1}
+
+
+
+
+\tableofcontents
+\listoffigures
+\listoftables
+
+\begin{abstract}
+Concurrent systems have been of interest for decades.
+With their simple but expressive semantics, concurrent systems become a good choice to fit the data and analyze the underlying mechanics.
+However, \textit{learning} and \textit{analyzing} such concurrent systems are computationally difficult.
+When dealing with big data sets, the state-of-the-art techniques appear to be insufficient, either in term of efficiency or in term of precision.
+
+In this thesis, we propose a refined modeling framework ABAN (Asynchronous Binary Automata Network) and develop reachability analysis techniques based on ABAN: PermReach (Reachability \textit{via} Permutation search) and ASPReach (Reachability \textit{via} Answer Set Programming).
+Then we propose two model learning/constructing methods: CRAC (Completion \textit{via} Reachability And Correlations) and M2RIT (Model Revision \textit{via} Reachability and Interpretation Transitions) using respectively continuous and discrete data to fit the model and using reachability properties to constrain the output models.
+
+Chapter~\ref{chap:intro} states briefly the background and the contribution of our research.
+
+Chapter~\ref{chap:stateOfTheArt} introduces the state of the art on modeling frameworks, model checkers, different update schemes of modelings and model learning techniques.
+Some of them are referenced in the following chapters.
+
+Chapter~\ref{chap:refinement} presents our modeling framework and its related reachability analyzers based on static analysis.
+We focus on the inconclusive cases of pure static analysis and extract the key components preventing from a direct solution.
+We then apply heuristics on these components, solving them with a limited search to reach a more conclusive result of the reachability problem.
+
+Chapter~\ref{chap:modelInference} presents the methodology of model learning.
+Our model learners CRAC and M2RIT perform in fact model selection. 
+They choose a model from the candidates satisfying the provided reachability constraints.
+However the number of candidate models can be exponential, our model learners can shrink the search space with constraints when generating the models.
+
+Chapter~\ref{chap:test} shows some comparative and exploratory tests and their results on the methods presented in Chapter~\ref{chap:refinement} and Chapter~\ref{chap:modelInference}.
+PermReach and ASPReach are more efficient than traditional model checkers on the reachability analysis and they perform a more conclusive analysis while holding the running time in the same scale as pure static analyzers have.
+
+Chapter~\ref{chap:conclusion} concludes the thesis and proposes some possible future work.
+\end{abstract}
+
+\newpage
+\renewcommand{\abstractname}{R\'esum\'e} 
+\begin{abstract}
+\pagestyle{empty}
+Les syst\`emes concurrents pr\'esentent un int\'er\^et depuis des d\'ecennies.
+Avec leur s\'emantique simple mais expressive, les syst\`emes concurrents deviennent un bon choix pour ajuster les donn\'ees et analyser les m\'ecanismes sous-jacents.
+Cependant, \textit{l'apprentissage et l'analyse} de tels syst\`emes concurrents sont difficiles pour ce qui concerne les calculs. %\roux{en calcul}{pour ce qui concerne les calculs}.
+Lorsqu'il s'agit de grands ensembles de donn\'ees, les techniques les plus r\'ecentes semblent insuffisantes, que ce soit en termes d'efficacit\'e ou de pr\'ecision.
+
+Dans cette th\`ese, nous proposons un cadre de mod\'elisation raffin\'e ABAN (Asynchronous Binary Automata Network) et d\'eveloppons des techniques d'analyse d'atteignabilit\'e bas\'ees sur ABAN: PermReach (Reachability \textit{via} Permutation search) et ASPReach (Reachability \textit{via} Answer Set Programming).
+Nous proposons ensuite deux m\'ethodes de construction et d'appren-tissage %\roux{d'apprentissage}{de construction et d'apprentissage} 
+des mod\`eles: CRAC (Completion \textit{via} Reachability And Correlations) et M2RIT (Model Revision \textit{via} Reachability and Interpretation Transitions) en utilisant respectivement des donn\'ees continues et discr\`etes pour s'ajuster au mod\`ele et des propri\'et\'es d'accessibilit\'e afin de contraindre les mod\`eles r\'esultants.% \roux{pour contraindre les mod\`eles en sortie}{afin de contraindre les mod\`eles résultants}.
+
+Le chapitre~\ref{chap:intro} d\'ecrit bri\`evement le contexte et la contribution de nos recherches.
+Le chapitre~\ref{chap:stateOfTheArt} pr\'esente l'\'etat de l'art des mod\'elisations, des model checkers, des diff\'erentes dynamiques associ\'e aux mod\`es et les techniques d'apprentissage des mod\`eles.
+Certains d'entre eux sont r\'ef\'erenc\'es dans les chapitres suivants.
+
+Le chapitre~\ref{chap:refinement} pr\'esente notre cadre de mod\'elisation et ses analyseurs d'accessibilit\'e associ\'es, qui sont %\roux{li\'es}{associ\'es, qui sont}
+ bas\'es sur l'analyse statique.
+Nous nous concentrons sur les cas non concluants d'analyse statique pure et extrayons les composants cl\'es emp\^echant une solution directe.
+Nous appliquons ensuite des heuristiques sur ces composants, en les r\'esolvant avec une recherche limit\'ee pour obtenir un r\'esultat plus concluant du probl\`eme d'accessibilit\'e.
+
+Le chapitre~\ref{chap:modelInference} pr\'esente la m\'ethodologie de l'apprentissage par mod\`ele.
+Nos syst\`emes de construction de mod\`eles par apprentissage %\roux{apprenants mod\`eles}{syst\`emes de construction de mod\`eles par apprentissage}
+ CRAC et M2RIT effectuent en fait une s\'election des mod\`eles.
+Ils choisissent un mod\`ele parmi les candidats qui satisfont \`a toutes les contraintes d'accessibilit\'e donn\'ees.
+Cependant, le nombre de mod\`eles candidats pouvant \^etre de tr\`es grande taille, %\roux{exponentiels}{de tr\`es grande taille}
+ nos r\'eviseurs de mod\`eles peuvent r\'eduire l'espace de recherche avec des contraintes lors de la g\'en\'eration des mod\`eles.
+
+Le chapitre~\ref{chap:test} pr\'esente quelques tests comparatifs et exploratoires et leurs r\'esultats sur les m\'ethodes pr\'esent\'ees aux chapitres~\ref{chap:refinement} et \ref{chap:modelInference}.
+PermReach et ASPReach sont plus efficaces que les v\'erificateurs de mod\`ele traditionnels pour l'analyse de l'accessibilit\'e. Ils effectuent une analyse plus concluante tout en maintenant la dur\'ee de fonctionnement \`a la m\^eme \'echelle que les analyseurs statiques purs.
+
+Le chapitre~\ref{chap:conclusion} conclut la th\`ese et propose des travaux futurs possibles.
+\end{abstract}
+
+\newpage
+\chapter*{List of symbols}
+\thispagestyle{empty}
+\begin{tabular}{l|l}
+    $\land$ & logic AND\\
+    $\lor$ & logic OR\\
+    $\oplus$ & logic XOR\\
+    $|A|$ & the cardinality of set $A$\\
+    $[i,j]$& the interval comprising real numbers $x$ satisfying $i\leq x\leq j$\\
+    $[i;j]$& the interval comprising integers $x$ satisfying $i\leq x\leq j$\\
+    $C_n^k$& the $k$-combination in the set of $n$ elements, $C_n^k=\frac {n!}{k!(n-k)!}$\\
+    $a_i$  & automaton $a$ is taking value $i$ \\
+    $x::y$ & event $x$ happens just before $y$ in the sequence\\
+    $a.next$&the successor of $a$\\
+    $a.pred$ & the predecessor of $a$\\
+    $A\to b_j$ & condition $A$ allows automaton $b$ to reach qualitative level $j$\\
+    $\mathbb{N}$ & the set of all natural numbers\\
+    $\bar{x}$ & the mean of variable $x$
+\end{tabular}
+\newpage
+\pagenumbering{arabic} 
+\input{Chap1-Introduction.tex}
+
+\input{Chap2-State-Of-The-Art.tex}
+
+\input{Chap3-Refinements-Of-Reachability-Analysis.tex}
+
+\input{Chap4-Model-Inference-And-Revision.tex}
+
+\input{Chap5-Tests-And-Benchmarks.tex}
+
+\input{Chap6-Conclusion-And-Future-Work.tex}
+
+\bibliographystyle{plain}
+\bibliography{bib}
+
+\appendix
+\input{Chap7-Appendix.tex}
+\includepdfmerge{Thesis_cover.pdf,2}
+\end{document}

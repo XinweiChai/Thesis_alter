@@ -1,0 +1,61 @@
+\begin{minipage}{0.55\textwidth}
+\centering
+\begin{tikzpicture}[apdotsimple/.style={apdot}]
+\scriptsize
+\TSort{(0,0)}{a}{2}{l}
+\TSort{(1.7,0)}{b}{2}{l}
+\TSort{(3.4,0)}{c}{2}{l}
+\TSort{(5.1,0)}{d}{2}{l}
+% with delays
+\path[local transitions]
+
+	(a_0) edge node[auto] {\{$b_1, c_1$\}} (a_1)
+	(c_0) edge node[auto] {\{$a_1$\}} (c_1)
+	(a_0) edge[bend right] node[right] {\{$b_0$\}} (a_1)
+	(b_1) edge[bend right] node[auto] {\{$d_1$\}} (b_0)
+	(d_0) edge node[auto] {\{$b_1$\}} (d_1)
+;
+\TState{a_0, b_1, c_1,d_0}
+\end{tikzpicture}
+\end{minipage}\hfill
+\begin{minipage}{0.45\textwidth}
+\centering
+\begin{tikzpicture}[aS]  
+  	
+  	\startl{a_1};
+    \node[Asol,right of=a_1] (a_1s){};
+    \node[Aproc, above right of = a_1s] (c_1){$c_1$};
+    \node[Aproc, right of = a_1s] (b_1){$b_1$};
+    \node[Asol, right of = c_1](c_1s){};
+    \node[Assol, right of = c_1s](c_1st){$\varnothing$};
+    \node[Asol, right of = b_1](b_1s){};
+    \node[Assol, right of = b_1s](b_1st){$\varnothing$};
+    
+    \node[Asol,left of=c_1](c_1s1){};
+    \node[Asol,below right = 0.2cm and 0.3cm of a_1] (a_1s1){};
+    \node[Aproc, below right = 0.2cm and 0.3cm of a_1s1] (b_0){$b_0$};
+    \node[Asol, right of = b_0](b_0s){};
+    \node[Aproc, right = 0.45cm of b_0s](d_1){$d_1$};
+    \node[Asol, right of = d_1](d_1s){};
+    \path 
+    (a_1s) edge (c_1)
+    (a_1s) edge (b_1)
+    (c_1) edge (c_1s)
+    (c_1s) edge (c_1st)
+    (b_1) edge (b_1s)
+    (b_1s) edge (b_1st)
+    (a_1) edge (a_1s)
+    
+    (c_1) edge (c_1s1)
+    (c_1s1) edge (a_1)
+    
+    (a_1) edge (a_1s1)
+    (a_1s1) edge (b_0)
+    
+    (b_0) edge (b_0s)
+    (b_0s) edge (d_1)
+    (d_1) edge (d_1s)
+    (d_1s) edge (b_1)
+    ; 
+\end{tikzpicture}
+\end{minipage}

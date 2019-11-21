@@ -1,0 +1,26 @@
+\begin{tikzpicture}[>=stealth]
+\node (O1) at (0,0) {$a_0\Rsh^*a_1$};
+\node[draw] (Pm1) at (-1.75,0) {$a_1$};
+\draw[->] (Pm1)-- (O1);
+\node (S1) at ($(O1)+(1.5,0)$){};
+\draw[->] (O1) -- (S1);
+\draw (S1) circle (3pt);
+\node[draw] (P1) at ($(S1)+(1,1)$){$b_1$};
+\node[draw] (P2) at ($(S1)+(1,-1)$){$c_1$};
+\draw[->] (S1)--(P1);
+\draw[->] (S1)--(P2);
+\node (O2) at ($(P1)+(1.75,0)$) {$b_0\Rsh^*b_1$};
+\node (O3) at ($(P2)+(1.75,0)$) {$\perp$};
+\draw[->] (P1)--(O2);
+\draw[->] (P2)--(O3);
+\node (S2) at ($(O2)+(1.5,0)$){};
+\draw (S2) circle (3pt);
+\draw[->] (O2) -- (S2);
+\node[draw] (P3) at ($(S2)+(1,0)$){$d_0$};
+\draw[->] (S2) -- (P3);
+\node (O5) at ($(P3)+(1.75,0)$) {$d_0\Rsh^*d_0$};
+\draw[->] (P3)--(O5);
+\node (S5) at ($(O5)+(1.5,0)$){};
+\draw (S5) circle (3pt);
+\draw[->] (O5) -- (S5);
+\end{tikzpicture}

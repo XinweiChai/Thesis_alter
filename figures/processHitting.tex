@@ -1,0 +1,35 @@
+\begin{tikzpicture}[scale=0.9]%[font=\scriptsize]
+%\path[use as bounding box] (0,-1) rectangle (4,4);
+%{left, right, top, bottom}
+\TSort{(0,0)}{a}{2}{l}
+\TSort{(3,0)}{b}{3}{l}
+\TSort{(6,0)}{d}{3}{r}
+\TSort{(2,-2)}{c}{2}{b}
+
+\THit{a_1}{}{b_1}{.west}{b_0}
+\THit{a_0}{}{c_0}{.north}{c_1}
+\THit{b_1}{}{a_0}{.east}{a_1}
+\THit{c_1}{out=120,in=255}{b_0}{.west}{b_1}
+\THit{b_0}{}{d_0}{.west}{d_1}
+\THit{b_1}{}{d_1}{.west}{d_2}
+\THit{b_2}{distance=120pt,out=30,in=40}{d_0}{.east}{d_2}
+\THit{d_1}{}{b_0}{.north east}{b_2}
+\THit{c_1}{bend right=80pt,distance=80pt}{d_1}{.east}{d_0}
+
+\path[bounce,bend right]
+\TBounce{b_1}{}{b_0}{.north}
+\TBounce{a_0}{}{a_1}{.south}
+\TBounce{d_0}{bend right=50pt,distance=40pt}{d_2}{.south}
+\TBounce{b_0}{}{b_2}{.south}
+;
+\path[bounce,bend left]
+\TBounce{d_0}{}{d_1}{.south}
+\TBounce{b_0}{}{b_1}{.south}
+\TBounce{c_0}{}{c_1}{.west}
+\TBounce{d_1}{}{d_2}{.south}
+\TBounce{d_1}{}{d_0}{.north}
+;
+\path[bounce,bend left]
+;
+\TState{a_1,b_0,c_0,d_1}
+\end{tikzpicture}
