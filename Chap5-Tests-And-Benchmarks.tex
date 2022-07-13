@@ -313,19 +313,25 @@ This operation allows us to obtain a time-series data matching perfectly asynchr
 Hence, such time-series data fit perfectly asynchronous LFIT algorithm.
 However, they do not exist in real world as we cannot limit the number of state changes at each observation.
 
-$$A=\kbordermatrix{\mbox{\footnotesize$t$}&0&1&2&3\\
+$$A=\begin{blockarray}{ccccc}
+t&0&1&2&3 \\
+\begin{block}{c[cccc]}
 a&\mathbf{0}&\mathbf{1}&1&1\\
 b&\mathbf{0}&\mathbf{1}&0&1\\
 c&\mathbf{1}&\mathbf{0}&1&1\\
-d&\mathbf{0}&\mathbf{0}&0&1
-}
+d&\mathbf{0}&\mathbf{0}&0&1\\
+\end{block}
+\end{blockarray}
 \hspace{2cm}
-A'=\kbordermatrix{\mbox{\footnotesize$t$}&0&1&2&3\\
+A'=\begin{blockarray}{ccccc}
+t&0&1&2&3 \\
+\begin{block}{c[cccc]}
 a&\mathbf{0}&\mathbf{1}&1&1\\
 b&0&\mathbf{0}&\mathbf{1}&1\\
 c&1&1&\mathbf{1}&\mathbf{0}\\
-d&0&0&0&0
-}
+d&0&0&0&0\\
+\end{block}
+\end{blockarray}
 $$
 The left matrix $A$ is an example of generalized time series data, where at each time point multiple variables can change their values.
 The right matrix $A'$ is an example of ``asynchronous'' time-series data, where at each time point at most one variable changes its value.

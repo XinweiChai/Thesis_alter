@@ -673,20 +673,27 @@ $A'^1$ is used to compute the correlation between the change rate of $a$ and oth
 \begin{equation}\label{eq:changeRate}
     a'(t)=\dfrac{\Delta a(t)}{\Delta t}=\dfrac{a(t+1)-a(t)}{(t+1)-t}=a(t+1)-a(t)
 \end{equation}
-
-$$A=\kbordermatrix{\mbox{\footnotesize$t$}&0&1&2&3\\
+{\small
+$$
+A=\begin{blockarray}{ccccc}
+ t&0&1&2&3 \\
+\begin{block}{c[cccc]}
 a&a(0)&a(1)&a(2)&a(3)\\
 b&b(0)&b(1)&b(2)&b(3)\\
 c&c(0)&c(1)&c(2)&c(3)\\
-d&d(0)&d(1)&d(2)&d(3)
-}
-\to A'^1=\kbordermatrix{\mbox{\footnotesize$t$}&0&1&2\\
+d&d(0)&d(1)&d(2)&d(3)\\
+\end{block}
+\end{blockarray}
+\to A'^1=\begin{blockarray}{cccc}
+t&0&1&2\\
+\begin{block}{c[ccc]}
 a'&a'(0)&a'(1)&a'(2)\\
 b&b(0)&b(1)&b(2)\\
 c&c(0)&c(1)&c(2)\\
-d&d(0)&d(1)&d(2)
-}$$
-
+d&d(0)&d(1)&d(2)\\
+\end{block}
+\end{blockarray}$$
+}
 In this way, regulations of $b,c,d$ on $a$ are then evaluated by PPCC or PSCC (see Definition~\ref{def:PPCC} and~\ref{def:PSCC}).
 \end{example}
 
@@ -801,38 +808,57 @@ $d$&-0.4&-0.15&-0.5&-0.3&0.01&-0.04&0.03&0.04
 
 After data regrouping, we obtain 4 matrices consisting of the change rate of each variable respectively, four correlation matrices are then computed: 
 {\small
-$$\kbordermatrix{\mbox{}&a'&b&c&d\\
+$\begin{blockarray}{ccccc}
+&a'&b&c&d  \\
+\begin{block}{c[cccc]}
  a'&1.0&0.09&-0.30&-0.09\\
  b&0.09&1.0&-0.74&0.42\\
  c&-0.30&-0.74&1.0&-0.38\\
- d&-0.09&0.42&-0.38&1.0
-}
-\kbordermatrix{\mbox{}&a&b'&c&d\\
+ d&-0.09&0.42&-0.38&1.0\\
+\end{block}
+\end{blockarray}
+\begin{blockarray}{ccccc}
+&a&b'&c&d  \\
+\begin{block}{c[cccc]}
  a&1.0&0.65&0.90&-0.98\\
  b'&0.65&1.0&0.75&-0.62\\
  c&0.90&0.75&1.0&-0.89\\
- d&-0.98&-0.62&-0.88&1.0 
-}$$
-$$\kbordermatrix{\mbox{}&a&b&c'&d\\
+ d&-0.98&-0.62&-0.88&1.0\\
+\end{block}
+\end{blockarray}$
+
+$
+\begin{blockarray}{ccccc}
+&a&b&c'&d  \\
+\begin{block}{c[cccc]}
 a&1.0&0.72&-0.56&-0.93\\
 b&0.72&1.0&-0.71&-0.71\\
 c'&-0.56&-0.71&1.0&0.70\\
-d&-0.93&-0.71&0.70&1.0   
-}
-\kbordermatrix{\mbox{}&a&b&c&d'\\
+d&-0.93&-0.71&0.70&1.0\\
+\end{block}
+\end{blockarray}
+\begin{blockarray}{ccccc}
+&a&b&c&d'  \\
+\begin{block}{c[cccc]}
 a&1.0&-0.68&0.78&0.89\\
 b&-0.68&1.0&-0.93&-0.88\\
 c&0.78&-0.93&1.0&0.91\\
-d'&0.88&-0.88&0.91&1.0   
-}$$
+d'&0.88&-0.88&0.91&1.0\\
+\end{block}
+\end{blockarray}$
 }
- $r'$ is formed by taking the $i$-th line from the $i$-th matrix, which suggests the relevance between change rate of one variables and the others.
-$$r'=\kbordermatrix{\mbox{}&a'&b'&c'&d'\\
+
+$r'$ is formed by taking the $i$-th line from the $i$-th matrix, which suggests the relevance between change rate of one variables and the others.
+$$\begin{blockarray}{ccccc}
+&a'&b'&c'&d'  \\
+\begin{block}{c[cccc]}
 a&1.0&0.09&-0.30&-0.09\\
 b&0.65&1.0&0.75&-0.62\\
 c&-0.56&-0.71&1.0&0.70\\
-d&0.88&-0.87&0.91&1.0
-}$$
+d&0.88&-0.87&0.91&1.0\\
+\end{block}
+\end{blockarray}$$
+
 We can set an arbitrary threshold \textit{e.g.} $0.6$. 
 All the coefficients with their absolute value greater than $0.6$ are listed below:
 $$(b,a,0.65),\ (b,c,0.75),\ (b,d,-0.62),\ (c,b,-0.71)$$
